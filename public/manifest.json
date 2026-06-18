@@ -1,0 +1,24 @@
+{
+  "name": "灶王爷 · 菜品记账助手",
+  "short_name": "灶王爷",
+  "description": "餐饮小店记账助手，管理菜品成本、桌单收入和采购支出",
+  "start_url": "/zaowangye/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F5F7FA",
+  "theme_color": "#1976D2",
+  "icons": [
+    {
+      "src": "/zaowangye/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/zaowangye/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
