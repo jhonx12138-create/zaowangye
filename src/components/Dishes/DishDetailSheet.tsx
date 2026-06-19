@@ -2,7 +2,6 @@
  * DishDetailSheet — 菜品原料构成详情 Sheet
  * 展示菜品原料列表、各原料用量、成本分解
  */
-import { Box, Typography, Divider, Chip } from '@mui/material';
 import { useIngredientStore } from '../../stores/useIngredientStore';
 import { getDishCost, getGrossMargin } from '../../utils/calculations';
 import { formatMoney, formatPercent, MARGIN_COLORS, MARGIN_THRESHOLDS } from '../../constants';
@@ -23,101 +22,112 @@ export default function DishDetailSheet({ dish }: DishDetailSheetProps) {
     MARGIN_COLORS.low;
 
   return (
-    <Box>
+    <div>
       {/* 菜品概览 */}
-      <Box mb={2}>
-        <Box display="flex" alignItems="center" gap={1} mb={1}>
-          <Typography variant="h6" fontWeight={700}>{dish.name}</Typography>
-          <Chip label={dish.category} size="small" variant="outlined" />
-        </Box>
-        <Box display="flex" gap={2}>
-          <Box>
-            <Typography variant="caption" color="text.secondary">售价</Typography>
-            <Typography variant="body1" fontWeight={700}>{formatMoney(dish.price)}</Typography>
-          </Box>
-          <Box>
-            <Typography variant="caption" color="text.secondary">成本</Typography>
-            <Typography variant="body1" fontWeight={700}>{formatMoney(cost)}</Typography>
-          </Box>
-          <Box>
-            <Typography variant="caption" color="text.secondary">毛利率</Typography>
-            <Typography variant="body1" fontWeight={700} sx={{ color: marginColor }}>
-              {formatPercent(margin)}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography variant="caption" color="text.secondary">日均</Typography>
-            <Typography variant="body1" fontWeight={700}>{dish.dailySales}份</Typography>
-          </Box>
-        </Box>
-      </Box>
+      <div style={{ marginBottom: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+          <span style={{ fontSize: 17, fontWeight: 700 }}>{dish.name}</span>
+          <span
+            style={{
+              fontSize: 11,
+              padding: '2px 8px',
+              borderRadius: 10,
+              border: '1px solid var(--border)',
+              color: 'var(--text-secondary)',
+            }}
+          >
+            {dish.category}
+          </span>
+        </div>
+        <div style={{ display: 'flex', gap: 16 }}>
+          <div>
+            <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>售价</div>
+            <div className="mono" style={{ fontSize: 15, fontWeight: 700 }}>{formatMoney(dish.price)}</div>
+          </div>
+          <div>
+            <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>成本</div>
+            <div className="mono" style={{ fontSize: 15, fontWeight: 700 }}>{formatMoney(cost)}</div>
+          </div>
+          <div>
+            <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>毛利率</div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: marginColor }}>{formatPercent(margin)}</div>
+          </div>
+          <div>
+            <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>日均</div>
+            <div className="mono" style={{ fontSize: 15, fontWeight: 700 }}>{dish.dailySales}份</div>
+          </div>
+        </div>
+      </div>
 
-      <Divider sx={{ mb: 2 }} />
+      <div style={{ height: 1, background: 'var(--border)', marginBottom: 14 }} />
 
       {/* 原料构成 */}
-      <Typography variant="body2" fontWeight={700} mb={1}>
+      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>
         原料构成 · {dish.ings.length} 种
-      </Typography>
+      </div>
 
       {dish.ings.length === 0 ? (
-        <Typography variant="body2" color="text.secondary">
-          暂无原料数据
-        </Typography>
+        <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>暂无原料数据</div>
       ) : (
-        <Box display="flex" flexDirection="column" gap={1}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {dish.ings.map((ing, idx) => {
             const ingData = ingredients.find((i) => i.id === ing.ingId);
             const ingCost = ingData ? (ing.amount / 16) * ingData.pricePerJin : 0;
             const costPct = cost > 0 ? (ingCost / cost) * 100 : 0;
 
             return (
-              <Box
+              <div
                 key={idx}
-                display="flex"
-                alignItems="center"
-                justifyContent="space-between"
-                sx={{
-                  p: 1.5,
-                  borderRadius: 2,
-                  bgcolor: 'grey.50',
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: 10,
+                  borderRadius: 'var(--radius-sm)',
+                  background: 'var(--bg)',
                 }}
               >
-                <Box flex={1}>
-                  <Typography variant="body2" fontWeight={600}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600 }}>
                     {ingData?.name || '未知原料'}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
+                  </div>
+                  <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
                     {ing.amount} 两
                     {ingData && ` · ${formatMoney(ingData.pricePerJin)}/斤`}
                     {ingData?.supplier && ` · ${ingData.supplier}`}
-                  </Typography>
-                </Box>
-                <Box textAlign="right">
-                  <Typography variant="body2" fontWeight={600}>
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div className="mono" style={{ fontSize: 13, fontWeight: 600 }}>
                     {formatMoney(ingCost)}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
+                  </div>
+                  <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
                     占{costPct.toFixed(1)}%
-                  </Typography>
-                </Box>
-              </Box>
+                  </div>
+                </div>
+              </div>
             );
           })}
 
           {/* 合计 */}
-          <Box
-            display="flex"
-            alignItems="center"
-            justifyContent="space-between"
-            sx={{ p: 1.5, borderRadius: 2, bgcolor: 'primary.light', color: 'primary.dark' }}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: 10,
+              borderRadius: 'var(--radius-sm)',
+              background: 'var(--primary-bg)',
+              color: 'var(--primary-dark)',
+            }}
           >
-            <Typography variant="body2" fontWeight={700}>原料成本合计</Typography>
-            <Typography variant="body2" fontWeight={700}>
+            <span style={{ fontSize: 13, fontWeight: 700 }}>原料成本合计</span>
+            <span className="mono" style={{ fontSize: 13, fontWeight: 700 }}>
               {formatMoney(cost)}
-            </Typography>
-          </Box>
-        </Box>
+            </span>
+          </div>
+        </div>
       )}
-    </Box>
+    </div>
   );
 }

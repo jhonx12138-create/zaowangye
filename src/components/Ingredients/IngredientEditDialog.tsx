@@ -1,28 +1,24 @@
 /**
- * IngredientEditDialog — 添加/编辑原料对话框
- * 支持名称、单价、供应商字段
+ * IngredientEditSheet — 添加/编辑原料底部半弹层
+ * 从底部滑入的半透明遮罩 + 白色卡片，替代居中弹窗
  */
 import { useState, useEffect } from 'react';
-import {
-  Dialog, DialogTitle, DialogContent, DialogActions,
-  Button, TextField, Box, Typography,
-} from '@mui/material';
+import { TextField, Box } from '@mui/material';
 import type { Ingredient } from '../../types';
 
-interface IngredientEditDialogProps {
+interface IngredientEditSheetProps {
   open: boolean;
   onClose: () => void;
   onSave: (data: { name: string; pricePerJin: number; supplier: string }) => void;
-  /** 编辑模式：传入已有原料 */
   ingredient?: Ingredient | null;
 }
 
-export default function IngredientEditDialog({
+export default function IngredientEditSheet({
   open,
   onClose,
   onSave,
   ingredient,
-}: IngredientEditDialogProps) {
+}: IngredientEditSheetProps) {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [supplier, setSupplier] = useState('');
@@ -67,11 +63,67 @@ export default function IngredientEditDialog({
     onClose();
   };
 
+  if (!open) return null;
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-      <DialogTitle>{isEdit ? '编辑原料' : '添加原料'}</DialogTitle>
-      <DialogContent>
-        <Box display="flex" flexDirection="column" gap={2} mt={1}>
+    <>
+      {/* 半透明遮罩 */}
+      <Box
+        onClick={onClose}
+        sx={{
+          position: 'fixed',
+          inset: 0,
+          bgcolor: 'rgba(0,0,0,0.4)',
+          zIndex: 1300,
+          animation: 'fadeIn 0.2s ease',
+          '@keyframes fadeIn': {
+            from: { opacity: 0 },
+            to: { opacity: 1 },
+          },
+        }}
+      />
+
+      {/* 底部白色卡片 */}
+      <Box
+        onClick={(e) => e.stopPropagation()}
+        sx={{
+          position: 'fixed',
+          bottom: 0,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 375,
+          maxWidth: '100%',
+          bgcolor: '#fff',
+          borderRadius: '14px 14px 0 0',
+          zIndex: 1301,
+          px: 2.5,
+          pt: 1.5,
+          pb: 3,
+          animation: 'slideUp 0.25s ease',
+          '@keyframes slideUp': {
+            from: { transform: 'translateX(-50%) translateY(100%)' },
+            to: { transform: 'translateX(-50%) translateY(0)' },
+          },
+        }}
+      >
+        {/* 拖动把手 */}
+        <Box
+          sx={{
+            width: 36,
+            height: 4,
+            borderRadius: 2,
+            bgcolor: '#D0D0D0',
+            mx: 'auto',
+            mb: 1.5,
+          }}
+        />
+
+        {/* 标题 */}
+        <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 16 }}>
+          {isEdit ? '编辑原料' : '添加原料'}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <TextField
             label="原料名称"
             value={name}
@@ -79,6 +131,8 @@ export default function IngredientEditDialog({
             placeholder="例：猪肉"
             fullWidth
             autoFocus
+            size="small"
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 'var(--radius-sm)' } }}
           />
           <TextField
             label="单价（元/斤）"
@@ -87,8 +141,10 @@ export default function IngredientEditDialog({
             onChange={(e) => { setPrice(e.target.value); setError(''); }}
             placeholder="0.00"
             fullWidth
+            size="small"
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 'var(--radius-sm)' } }}
             InputProps={{
-              startAdornment: <Typography sx={{ mr: 0.5 }}>¥</Typography>,
+              startAdornment: <span style={{ marginRight: 4, color: 'var(--text-secondary)' }}>¥</span>,
             }}
           />
           <TextField
@@ -97,20 +153,21 @@ export default function IngredientEditDialog({
             onChange={(e) => { setSupplier(e.target.value); setError(''); }}
             placeholder="例：农贸市场"
             fullWidth
+            size="small"
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 'var(--radius-sm)' } }}
           />
           {error && (
-            <Typography color="error" variant="caption">
-              {error}
-            </Typography>
+            <div style={{ color: 'var(--red)', fontSize: 12 }}>{error}</div>
           )}
-        </Box>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>取消</Button>
-        <Button onClick={handleSave} variant="contained">
-          {isEdit ? '保存修改' : '添加'}
-        </Button>
-      </DialogActions>
-    </Dialog>
+        </div>
+
+        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 20 }}>
+          <button className="btn-pill btn-pill-outline" onClick={onClose}>取消</button>
+          <button className="btn-pill btn-pill-primary" onClick={handleSave}>
+            {isEdit ? '保存修改' : '添加'}
+          </button>
+        </div>
+      </Box>
+    </>
   );
 }

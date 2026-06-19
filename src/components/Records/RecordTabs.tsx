@@ -1,30 +1,52 @@
 /**
  * RecordTabs — 记账页面 Tab 切换
- * 「记一笔」和「今日已记」两个 Tab
+ * 「记一笔」和「今日已记」两个按钮
  */
-import { Tabs, Tab, Paper } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import ListAltIcon from '@mui/icons-material/ListAlt';
-
 interface RecordTabsProps {
   value: number;
-  onChange: (_: React.SyntheticEvent, newValue: number) => void;
+  onChange: (newValue: number) => void;
 }
 
 export default function RecordTabs({ value, onChange }: RecordTabsProps) {
+  const tabs = [
+    { label: '✏️ 记一笔', idx: 0 },
+    { label: '📋 今日已记', idx: 1 },
+  ];
+
   return (
-    <Paper sx={{ mb: 2 }}>
-      <Tabs
-        value={value}
-        onChange={onChange}
-        variant="fullWidth"
-        sx={{
-          '& .MuiTab-root': { py: 1.5, fontWeight: 600 },
-        }}
-      >
-        <Tab icon={<EditIcon />} label="记一笔" iconPosition="start" />
-        <Tab icon={<ListAltIcon />} label="今日已记" iconPosition="start" />
-      </Tabs>
-    </Paper>
+    <div
+      className="card"
+      style={{
+        display: 'flex',
+        padding: 4,
+        marginBottom: 10,
+        gap: 4,
+      }}
+    >
+      {tabs.map((tab) => {
+        const isActive = value === tab.idx;
+        return (
+          <button
+            key={tab.idx}
+            onClick={() => onChange(tab.idx)}
+            style={{
+              flex: 1,
+              padding: '10px 0',
+              borderRadius: 'var(--radius-sm)',
+              border: 'none',
+              background: isActive ? 'var(--primary)' : 'transparent',
+              color: isActive ? '#fff' : 'var(--text-secondary)',
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+              transition: 'all 0.15s',
+            }}
+          >
+            {tab.label}
+          </button>
+        );
+      })}
+    </div>
   );
 }

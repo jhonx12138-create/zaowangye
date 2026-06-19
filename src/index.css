@@ -2,33 +2,272 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 全局平滑滚动与移动端优化 */
+/* ═══════ 灶王爷 · 经典蓝设计系统 ═══════ */
+:root {
+  --bg: #f5f7fa;
+  --card: #ffffff;
+  --text: #212121;
+  --text-secondary: #757575;
+  --primary: #1976D2;
+  --primary-dark: #1565C0;
+  --primary-light: #BBDEFB;
+  --primary-bg: #E3F2FD;
+  --accent: #FF6F00;
+  --accent-light: #FFF3E0;
+  --green: #2E7D32;
+  --green-bg: #E8F5E9;
+  --red: #C62828;
+  --red-bg: #FFEBEE;
+  --yellow: #F57F17;
+  --yellow-bg: #FFF8E1;
+  --border: #E0E0E0;
+  --shadow: 0 2px 10px rgba(0,0,0,0.05);
+  --radius: 11px;
+  --radius-sm: 7px;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Menlo', 'Consolas', monospace;
+  --nav-height: 52px;
+  --safe-bottom: env(safe-area-inset-bottom, 18px);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
 html {
   -webkit-tap-highlight-color: transparent;
   scroll-behavior: smooth;
 }
 
 body {
-  margin: 0;
-  padding: 0;
-  background-color: #F5F7FA;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background: #e8e2d8;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* 安全区域适配（iPhone 刘海屏） */
-.safe-bottom {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+/* phone-frame — 模拟手机外壳 */
+.phone-frame {
+  width: 375px;
+  min-height: 100vh;
+  background: var(--bg);
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-shadow: 0 0 35px rgba(0,0,0,0.18);
+  display: flex;
+  flex-direction: column;
 }
 
-/* 自定义滚动条 */
-::-webkit-scrollbar {
-  width: 4px;
+@media (max-width: 375px) {
+  .phone-frame { width: 100%; }
 }
-::-webkit-scrollbar-track {
+
+/* 卡片 */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.card-tight { padding: 10px 14px; }
+
+/* 等宽数字 */
+.mono {
+  font-family: var(--font-mono);
+  letter-spacing: -0.5px;
+}
+
+/* 药丸按钮 */
+.btn-pill {
+  border-radius: 24px;
+  padding: 9px 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.btn-pill-primary {
+  background: var(--primary);
+  color: #fff;
+  width: 100%;
+  font-size: 14px;
+  padding: 12px;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 3px 14px rgba(25,118,210,0.28);
+}
+
+.btn-pill-outline {
+  background: #fff;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+}
+
+/* 页面 */
+.page-active {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 6px 10px 0;
+  flex: 1;
+}
+
+/* header */
+.app-header {
+  padding: 12px 12px 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--card);
+}
+
+/* bottom nav — fixed to viewport bottom */
+.bottom-nav-container {
+  position: fixed;
+  bottom: 0;
+  width: 375px;
+  max-width: 100%;
+  height: var(--nav-height);
+  background: #fff;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding-bottom: var(--safe-bottom);
+  z-index: 100;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 5px 7px;
+  border: none;
   background: transparent;
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
 }
-::-webkit-scrollbar-thumb {
-  background: #BBDEFB;
-  border-radius: 4px;
+
+.nav-item .nav-icon { font-size: 22px; }
+
+.nav-center-fab {
+  position: relative;
+  top: -10px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(25,118,210,0.35);
 }
+
+/* 时段 chip */
+.period-chip {
+  padding: 5px 9px;
+  border-radius: 13px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid var(--border);
+  background: #fff;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.period-chip.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* 分类 tab */
+.cat-chip {
+  padding: 4px 10px;
+  border-radius: 14px;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1.5px solid var(--border);
+  background: #fff;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+.cat-chip.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+/* dish row */
+.dish-row {
+  display: flex;
+  align-items: center;
+  padding: 8px 2px;
+  border-bottom: 1px solid #f8f5ef;
+  gap: 6px;
+}
+
+/* 数字按钮 */
+.qty-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* toast */
+.toast-msg {
+  position: fixed;
+  bottom: calc(var(--nav-height) + var(--safe-bottom) + 65px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 400;
+  background: #212121;
+  color: #fff;
+  padding: 7px 14px;
+  border-radius: 14px;
+  font-size: 11px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+/* demo badge */
+.demo-badge {
+  background: var(--accent-light);
+  color: var(--accent);
+  padding: 2px 5px;
+  border-radius: 7px;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+/* custom scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #c0c0c0; border-radius: 2px; }

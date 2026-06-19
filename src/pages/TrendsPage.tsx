@@ -1,9 +1,7 @@
 /**
  * TrendsPage — 经营趋势图页面
- * 展示历史净利/收支趋势图，支持模式切换
+ * 展示历史净利/收支趋势图
  */
-import { useState } from 'react';
-import { Box, Typography, Paper } from '@mui/material';
 import TrendChart from '../components/Trends/TrendChart';
 import { useDailySummary } from '../hooks/useDailySummary';
 
@@ -11,28 +9,26 @@ export default function TrendsPage() {
   const { historySummaries } = useDailySummary();
 
   return (
-    <Box>
-      <Typography variant="h5" fontWeight={700} mb={2}>
+    <div>
+      <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 10 }}>
         经营趋势图
-      </Typography>
+      </div>
 
       {historySummaries.length === 0 ? (
-        <Paper sx={{ p: 4, textAlign: 'center' }}>
-          <Typography color="text.secondary" gutterBottom>
-            暂无历史数据
-          </Typography>
-          <Typography variant="caption" color="text.disabled">
+        <div className="card" style={{ textAlign: 'center', padding: 24 }}>
+          <div style={{ color: 'var(--text-secondary)', marginBottom: 4 }}>暂无历史数据</div>
+          <div style={{ fontSize: 12, color: 'var(--text-secondary)', opacity: 0.7 }}>
             多记几天账后，这里会展示经营趋势图表
-          </Typography>
-        </Paper>
+          </div>
+        </div>
       ) : (
         <>
-          <Typography variant="caption" color="text.secondary" mb={1} display="block">
+          <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginBottom: 8 }}>
             共 {historySummaries.length} 天数据
-          </Typography>
+          </div>
           <TrendChart data={historySummaries} />
         </>
       )}
-    </Box>
+    </div>
   );
 }

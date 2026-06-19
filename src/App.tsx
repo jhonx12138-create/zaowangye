@@ -1,10 +1,9 @@
 /**
  * App 根组件
- * 职责：配置 MUI 主题、CssBaseline、HashRouter 路由表
- * 启动时执行 IndexedDB 数据恢复检查
+ * 职责：HashRouter 路由表 + 启动初始化
+ * 使用 phone-frame 经典蓝设计系统（CSS Variables）
  */
 import { useEffect, useState } from 'react';
-import { ThemeProvider, createTheme, CssBaseline, CircularProgress, Box, Typography } from '@mui/material';
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { restoreAllFromIndexedDB } from './utils/syncManager';
 import { initDemoData } from './utils/demo';
@@ -16,49 +15,7 @@ import IngredientsPage from './pages/IngredientsPage';
 import SettingsPage from './pages/SettingsPage';
 import TrendsPage from './pages/TrendsPage';
 
-const theme = createTheme({
-  palette: {
-    primary: { main: '#1976D2', dark: '#1565C0', light: '#BBDEFB' },
-    secondary: { main: '#FF6F00' },
-    background: { default: '#F5F7FA', paper: '#FFFFFF' },
-    success: { main: '#2E7D32' },
-    error: { main: '#C62828' },
-  },
-  typography: {
-    fontFamily: `"PingFang SC","Microsoft YaHei",sans-serif`,
-    h4: { fontWeight: 700 },
-    h5: { fontWeight: 600 },
-    h6: { fontWeight: 600 },
-  },
-  shape: { borderRadius: 24 },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          textTransform: 'none',
-          borderRadius: 24,
-          fontWeight: 600,
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          borderRadius: 16,
-        },
-      },
-    },
-    MuiChip: {
-      styleOverrides: {
-        root: {
-          borderRadius: 20,
-        },
-      },
-    },
-  },
-});
-
-/** 启动初始化组件 — 检查 IndexedDB 恢复 + 初始化演示数据 */
+/** 启动初始化组件 — IndexedDB 恢复 + 演示数据 */
 function AppInit({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -66,12 +23,10 @@ function AppInit({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     async function init() {
       try {
-        // 尝试从 IndexedDB 恢复数据
         const restored = await restoreAllFromIndexedDB();
         if (restored > 0) {
           console.log(`[AppInit] Restored ${restored} store(s) from IndexedDB`);
         }
-        // 初始化演示数据（仅在首次使用时）
         initDemoData();
         setReady(true);
       } catch (e) {
@@ -84,18 +39,19 @@ function AppInit({ children }: { children: React.ReactNode }) {
 
   if (error) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh" p={3}>
-        <Typography color="error">{error}</Typography>
-      </Box>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', padding: 24, color: 'var(--red)' }}>
+        {error}
+      </div>
     );
   }
 
   if (!ready) {
     return (
-      <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="100vh" gap={2}>
-        <CircularProgress />
-        <Typography color="text.secondary">灶王爷正在起灶…</Typography>
-      </Box>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', gap: 12 }}>
+        <div style={{ width: 32, height: 32, border: '3px solid var(--primary-light)', borderTopColor: 'var(--primary)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+        <span style={{ color: 'var(--text-secondary)', fontSize: 14 }}>灶王爷正在起灶…</span>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
     );
   }
 
@@ -104,22 +60,19 @@ function AppInit({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <HashRouter>
-        <AppInit>
-          <Routes>
-            <Route element={<AppLayout />}>
-              <Route path="/" element={<DashboardPage />} />
-              <Route path="/records" element={<RecordsPage />} />
-              <Route path="/dishes" element={<DishesPage />} />
-              <Route path="/ingredients" element={<IngredientsPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/trends" element={<TrendsPage />} />
-            </Route>
-          </Routes>
-        </AppInit>
-      </HashRouter>
-    </ThemeProvider>
+    <HashRouter>
+      <AppInit>
+        <Routes>
+          <Route element={<AppLayout />}>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/records" element={<RecordsPage />} />
+            <Route path="/dishes" element={<DishesPage />} />
+            <Route path="/ingredients" element={<IngredientsPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/trends" element={<TrendsPage />} />
+          </Route>
+        </Routes>
+      </AppInit>
+    </HashRouter>
   );
 }

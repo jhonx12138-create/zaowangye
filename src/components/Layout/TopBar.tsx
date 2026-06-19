@@ -1,36 +1,34 @@
 /**
- * TopBar — 顶部标题栏
- * 显示应用名称「灶王爷」
+ * TopBar — 紧凑 App Header
+ * 左侧 logo 方块 + 名称，右侧店铺名小字
  */
-import { AppBar, Toolbar, Typography, Box } from '@mui/material';
-import RestaurantIcon from '@mui/icons-material/Restaurant';
+import { Box } from '@mui/material';
+import { useShopStore } from '../../stores/useShopStore';
 
 export default function TopBar() {
+  const shopInfo = useShopStore((s) => s.shopInfo);
+
   return (
-    <AppBar
-      position="fixed"
-      elevation={0}
-      sx={{
-        bgcolor: 'primary.main',
-        zIndex: (theme) => theme.zIndex.drawer + 1,
-      }}
-    >
-      <Toolbar sx={{ minHeight: '56px !important', px: 2 }}>
-        <RestaurantIcon sx={{ mr: 1, fontSize: 24 }} />
-        <Typography variant="h6" sx={{ fontWeight: 700, letterSpacing: 1, flexGrow: 1 }}>
-          灶王爷
-        </Typography>
+    <Box className="app-header">
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
         <Box
-          component="span"
           sx={{
-            fontSize: 12,
-            opacity: 0.7,
-            fontWeight: 500,
+            width: 28, height: 28, borderRadius: '7px',
+            bgcolor: 'var(--primary)', color: '#fff',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 15, fontWeight: 700,
           }}
         >
-          菜品记账助手
+          灶
         </Box>
-      </Toolbar>
-    </AppBar>
+        <Box component="span" sx={{ fontSize: 17, fontWeight: 700, color: 'var(--text)' }}>
+          灶王爷
+        </Box>
+        <Box component="span" className="demo-badge">演示中</Box>
+      </Box>
+      <Box component="span" sx={{ fontSize: 10, color: 'var(--text-secondary)' }}>
+        {shopInfo?.name || '我家小馆'} · 桌单记账
+      </Box>
+    </Box>
   );
 }

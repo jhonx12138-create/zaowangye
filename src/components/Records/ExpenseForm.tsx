@@ -3,7 +3,7 @@
  * 支出类别选择 + 金额 + 备注
  */
 import { useState } from 'react';
-import { Box, TextField, ToggleButtonGroup, ToggleButton, Typography, Button } from '@mui/material';
+import { TextField } from '@mui/material';
 import { EXPENSE_CATEGORIES } from '../../constants';
 import type { ExpenseRecord, ExpenseCategory, Period } from '../../types';
 import { generateId, formatMoney } from '../../constants';
@@ -47,28 +47,27 @@ export default function ExpenseForm({ period, onSubmit }: ExpenseFormProps) {
   };
 
   return (
-    <Box>
-      <Typography variant="body2" color="text.secondary" gutterBottom fontWeight={600}>
+    <div>
+      {/* 支出类别 */}
+      <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8 }}>
         支出类别
-      </Typography>
-      <ToggleButtonGroup
-        value={category}
-        exclusive
-        onChange={(_, val) => val && setCategory(val)}
-        size="small"
-        sx={{ mb: 2, flexWrap: 'wrap', gap: 0.5 }}
-      >
-        {EXPENSE_CATEGORIES.map((cat) => (
-          <ToggleButton
-            key={cat.key}
-            value={cat.key}
-            sx={{ borderRadius: 3, px: 2, py: 0.5, textTransform: 'none', fontSize: 13 }}
-          >
-            {cat.label}
-          </ToggleButton>
-        ))}
-      </ToggleButtonGroup>
+      </div>
+      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
+        {EXPENSE_CATEGORIES.map((cat) => {
+          const isActive = category === cat.key;
+          return (
+            <button
+              key={cat.key}
+              onClick={() => setCategory(cat.key)}
+              className={`tag-btn${isActive ? ' active' : ''}`}
+            >
+              {cat.label}
+            </button>
+          );
+        })}
+      </div>
 
+      {/* 金额 */}
       <TextField
         fullWidth
         label="金额"
@@ -78,10 +77,20 @@ export default function ExpenseForm({ period, onSubmit }: ExpenseFormProps) {
         error={!!error && !!amount && isNaN(parseFloat(amount))}
         helperText={error && !!amount && isNaN(parseFloat(amount)) ? error : ''}
         placeholder="0.00"
-        sx={{ mb: 2 }}
-        InputProps={{ startAdornment: <Typography sx={{ mr: 0.5 }}>¥</Typography> }}
+        size="small"
+        sx={{
+          mb: 1.5,
+          '& .MuiOutlinedInput-root': {
+            borderRadius: 'var(--radius-sm)',
+            '& input': { fontFamily: 'var(--font-mono)', fontSize: 15 },
+          },
+        }}
+        InputProps={{
+          startAdornment: <span style={{ marginRight: 4, color: 'var(--text-secondary)' }}>¥</span>,
+        }}
       />
 
+      {/* 备注 */}
       <TextField
         fullWidth
         label="备注说明"
@@ -90,24 +99,25 @@ export default function ExpenseForm({ period, onSubmit }: ExpenseFormProps) {
         placeholder="例：猪肉10斤+青椒5斤"
         multiline
         rows={2}
-        sx={{ mb: 2 }}
+        size="small"
+        sx={{
+          mb: 1.5,
+          '& .MuiOutlinedInput-root': { borderRadius: 'var(--radius-sm)' },
+        }}
       />
 
       {error && (
-        <Typography color="error" variant="caption" display="block" mb={1}>
-          {error}
-        </Typography>
+        <div style={{ color: 'var(--red)', fontSize: 12, marginBottom: 8 }}>{error}</div>
       )}
 
-      <Button
-        variant="contained"
-        fullWidth
+      <button
+        className="btn-pill btn-pill-primary"
         onClick={handleSubmit}
         disabled={!amount || !note.trim()}
-        sx={{ py: 1.2 }}
+        style={{ width: '100%', padding: '12px 0', fontSize: 16 }}
       >
         确认支出 {amount ? formatMoney(parseFloat(amount)) : ''}
-      </Button>
-    </Box>
+      </button>
+    </div>
   );
 }

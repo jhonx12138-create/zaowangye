@@ -1,12 +1,7 @@
 /**
  * QuickStatsGrid — 2×2 统计网格
- * 展示收入/支出/日摊固定成本/记账笔数
+ * 蓝色底小卡片：收入/支出/日摊成本/记账笔数
  */
-import { Paper, Typography, Box, Skeleton } from '@mui/material';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import TodayIcon from '@mui/icons-material/Today';
-import ReceiptIcon from '@mui/icons-material/Receipt';
 import { useDailySummary } from '../../hooks/useDailySummary';
 import { useRecordStore } from '../../stores/useRecordStore';
 import { formatMoney } from '../../constants';
@@ -14,7 +9,7 @@ import { formatMoney } from '../../constants';
 interface StatItem {
   label: string;
   value: string;
-  icon: React.ReactNode;
+  icon: string;
   color: string;
   bgColor: string;
 }
@@ -24,82 +19,57 @@ export default function QuickStatsGrid() {
 
   if (!todaySummary) {
     return (
-      <Box mb={2}>
-        <Box display="grid" gridTemplateColumns="1fr 1fr" gap={1.5}>
+      <div style={{ marginBottom: 10 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
           {[1, 2, 3, 4].map((i) => (
-            <Paper key={i} sx={{ p: 2 }}>
-              <Skeleton variant="circular" width={32} height={32} />
-              <Skeleton variant="text" width="50%" />
-              <Skeleton variant="text" width="70%" height={30} />
-            </Paper>
+            <div key={i} className="card" style={{ height: 80 }} />
           ))}
-        </Box>
-      </Box>
+        </div>
+      </div>
     );
   }
 
   const { income, expense, fixed } = todaySummary;
-  // 从 RecordStore 直接获取今日记账笔数
   const todayRecords = useRecordStore((s) => s.todayRecords);
   const recordCount = (todayRecords?.income.length ?? 0) + (todayRecords?.expense.length ?? 0);
 
   const stats: StatItem[] = [
-    {
-      label: '收入',
-      value: formatMoney(income),
-      icon: <ArrowUpwardIcon />,
-      color: '#2E7D32',
-      bgColor: '#E8F5E9',
-    },
-    {
-      label: '支出',
-      value: formatMoney(expense),
-      icon: <ArrowDownwardIcon />,
-      color: '#C62828',
-      bgColor: '#FFEBEE',
-    },
-    {
-      label: '日摊成本',
-      value: formatMoney(fixed),
-      icon: <TodayIcon />,
-      color: '#FF6F00',
-      bgColor: '#FFF3E0',
-    },
-    {
-      label: '记账笔数',
-      value: `${recordCount || 0} 笔`,
-      icon: <ReceiptIcon />,
-      color: '#1565C0',
-      bgColor: '#E3F2FD',
-    },
+    { label: '收入', value: formatMoney(income), icon: '📈', color: 'var(--green)', bgColor: 'var(--green-bg)' },
+    { label: '支出', value: formatMoney(expense), icon: '📉', color: 'var(--red)', bgColor: 'var(--red-bg)' },
+    { label: '日摊成本', value: formatMoney(fixed), icon: '📅', color: 'var(--accent)', bgColor: 'var(--accent-light)' },
+    { label: '记账笔数', value: `${recordCount || 0} 笔`, icon: '📋', color: 'var(--primary-dark)', bgColor: 'var(--primary-bg)' },
   ];
 
   return (
-    <Box mb={2}>
-      <Box display="grid" gridTemplateColumns="1fr 1fr" gap={1.5}>
+    <div style={{ marginBottom: 10 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
         {stats.map((stat) => (
-          <Paper key={stat.label} sx={{ p: 2 }}>
-            <Box
-              sx={{
+          <div key={stat.label} className="card" style={{ padding: '10px 12px' }}>
+            <div
+              style={{
                 display: 'inline-flex',
-                p: 0.75,
-                borderRadius: 2,
-                bgcolor: stat.bgColor,
+                width: 28,
+                height: 28,
+                borderRadius: 'var(--radius-sm)',
+                background: stat.bgColor,
                 color: stat.color,
-                mb: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 14,
+                marginBottom: 6,
               }}
             >
               {stat.icon}
-            </Box>
-            <Typography variant="body2" color="text.secondary" gutterBottom>
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginBottom: 2 }}>
               {stat.label}
-            </Typography>
-            <Typography variant="h6" fontWeight={700}>
+            </div>
+            <div className="mono" style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>
               {stat.value}
-            </Typography>
-          </Paper>
+            </div>
+          </div>
         ))}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }

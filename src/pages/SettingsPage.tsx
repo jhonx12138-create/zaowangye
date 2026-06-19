@@ -3,11 +3,7 @@
  * 管理店铺信息、固定成本、数据导出与重置
  */
 import { useState } from 'react';
-import {
-  Box, Typography, Paper, TextField, Button, Divider,
-} from '@mui/material';
-import SaveIcon from '@mui/icons-material/Save';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import { TextField } from '@mui/material';
 import DataExportButton from '../components/Settings/DataExportButton';
 import { useShopStore } from '../stores/useShopStore';
 import { useFixedCostStore } from '../stores/useFixedCostStore';
@@ -22,7 +18,6 @@ export default function SettingsPage() {
   const showToast = useUIStore((s) => s.showToast);
   const showConfirm = useUIStore((s) => s.showConfirm);
 
-  // 店铺信息本地编辑态
   const [shopForm, setShopForm] = useState({ ...shopInfo });
   const [costForm, setCostForm] = useState({ ...fixedCosts });
 
@@ -42,7 +37,6 @@ export default function SettingsPage() {
       '此操作将清空所有记账数据、菜品和原料信息，且不可恢复。确定要继续吗？',
       () => {
         localStorage.clear();
-        // 使用 IndexedDB 删除所有备份
         import('../db').then(({ db }) => {
           db.backup.clear().catch(console.warn);
         });
@@ -52,24 +46,26 @@ export default function SettingsPage() {
     );
   };
 
+  const dayCount = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+  const dailyFixed = (costForm.rent + costForm.labor + costForm.utilities + costForm.seasoning) / dayCount;
+
   return (
-    <Box>
-      <Typography variant="h5" fontWeight={700} mb={2}>
+    <div>
+      <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 10 }}>
         小店设置
-      </Typography>
+      </div>
 
       {/* 店铺信息 */}
-      <Paper sx={{ p: 2, mb: 2 }}>
-        <Typography variant="body2" fontWeight={700} mb={1.5}>
-          🏪 店铺信息
-        </Typography>
-        <Box display="flex" flexDirection="column" gap={1.5}>
+      <div className="card" style={{ marginBottom: 10 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>🏪 店铺信息</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <TextField
             label="店铺名称"
             value={shopForm.name}
             onChange={(e) => setShopForm({ ...shopForm, name: e.target.value })}
             size="small"
             fullWidth
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 'var(--radius-sm)' } }}
           />
           <TextField
             label="店主"
@@ -77,6 +73,7 @@ export default function SettingsPage() {
             onChange={(e) => setShopForm({ ...shopForm, owner: e.target.value })}
             size="small"
             fullWidth
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 'var(--radius-sm)' } }}
           />
           <TextField
             label="电话"
@@ -84,6 +81,7 @@ export default function SettingsPage() {
             onChange={(e) => setShopForm({ ...shopForm, phone: e.target.value })}
             size="small"
             fullWidth
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 'var(--radius-sm)' } }}
           />
           <TextField
             label="地址"
@@ -91,24 +89,22 @@ export default function SettingsPage() {
             onChange={(e) => setShopForm({ ...shopForm, address: e.target.value })}
             size="small"
             fullWidth
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 'var(--radius-sm)' } }}
           />
-          <Button
-            variant="contained"
-            startIcon={<SaveIcon />}
+          <button
+            className="btn-pill btn-pill-primary"
             onClick={handleSaveShop}
-            size="small"
+            style={{ fontSize: 13, padding: '8px 0', width: '100%' }}
           >
-            保存店铺信息
-          </Button>
-        </Box>
-      </Paper>
+            💾 保存店铺信息
+          </button>
+        </div>
+      </div>
 
       {/* 固定成本 */}
-      <Paper sx={{ p: 2, mb: 2 }}>
-        <Typography variant="body2" fontWeight={700} mb={1.5}>
-          💰 月度固定成本
-        </Typography>
-        <Box display="flex" flexDirection="column" gap={1.5}>
+      <div className="card" style={{ marginBottom: 10 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>💰 月度固定成本</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <TextField
             label="房租（元/月）"
             type="number"
@@ -116,7 +112,8 @@ export default function SettingsPage() {
             onChange={(e) => setCostForm({ ...costForm, rent: Number(e.target.value) || 0 })}
             size="small"
             fullWidth
-            InputProps={{ startAdornment: <Typography sx={{ mr: 0.5 }}>¥</Typography> }}
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 'var(--radius-sm)' } }}
+            InputProps={{ startAdornment: <span style={{ marginRight: 4, color: 'var(--text-secondary)' }}>¥</span> }}
           />
           <TextField
             label="人工（元/月）"
@@ -125,7 +122,8 @@ export default function SettingsPage() {
             onChange={(e) => setCostForm({ ...costForm, labor: Number(e.target.value) || 0 })}
             size="small"
             fullWidth
-            InputProps={{ startAdornment: <Typography sx={{ mr: 0.5 }}>¥</Typography> }}
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 'var(--radius-sm)' } }}
+            InputProps={{ startAdornment: <span style={{ marginRight: 4, color: 'var(--text-secondary)' }}>¥</span> }}
           />
           <TextField
             label="水电（元/月）"
@@ -134,7 +132,8 @@ export default function SettingsPage() {
             onChange={(e) => setCostForm({ ...costForm, utilities: Number(e.target.value) || 0 })}
             size="small"
             fullWidth
-            InputProps={{ startAdornment: <Typography sx={{ mr: 0.5 }}>¥</Typography> }}
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 'var(--radius-sm)' } }}
+            InputProps={{ startAdornment: <span style={{ marginRight: 4, color: 'var(--text-secondary)' }}>¥</span> }}
           />
           <TextField
             label="调料辅料（元/月）"
@@ -143,47 +142,39 @@ export default function SettingsPage() {
             onChange={(e) => setCostForm({ ...costForm, seasoning: Number(e.target.value) || 0 })}
             size="small"
             fullWidth
-            InputProps={{ startAdornment: <Typography sx={{ mr: 0.5 }}>¥</Typography> }}
+            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 'var(--radius-sm)' } }}
+            InputProps={{ startAdornment: <span style={{ marginRight: 4, color: 'var(--text-secondary)' }}>¥</span> }}
           />
-          <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Typography variant="caption" color="text.secondary">
-              日摊成本 ≈ {formatMoney(
-                (costForm.rent + costForm.labor + costForm.utilities + costForm.seasoning) /
-                new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate()
-              )}
-            </Typography>
-            <Button
-              variant="contained"
-              startIcon={<SaveIcon />}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
+              日摊成本 ≈ {formatMoney(dailyFixed)}
+            </span>
+            <button
+              className="btn-pill btn-pill-primary"
               onClick={handleSaveCosts}
-              size="small"
+              style={{ fontSize: 13, padding: '6px 14px' }}
             >
-              保存成本
-            </Button>
-          </Box>
-        </Box>
-      </Paper>
+              💾 保存成本
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* 数据管理 */}
-      <Paper sx={{ p: 2, mb: 2 }}>
-        <Typography variant="body2" fontWeight={700} mb={1.5}>
-          📦 数据管理
-        </Typography>
-        <Box display="flex" flexDirection="column" gap={1.5}>
+      <div className="card" style={{ marginBottom: 10 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>📦 数据管理</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <DataExportButton />
-          <Divider />
-          <Button
-            variant="outlined"
-            color="error"
-            startIcon={<DeleteForeverIcon />}
+          <div style={{ height: 1, background: 'var(--border)' }} />
+          <button
+            className="btn-pill btn-pill-danger"
             onClick={handleReset}
-            fullWidth
-            sx={{ py: 1 }}
+            style={{ width: '100%', justifyContent: 'center', padding: '12px 0' }}
           >
-            重置所有数据
-          </Button>
-        </Box>
-      </Paper>
-    </Box>
+            🗑 重置所有数据
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

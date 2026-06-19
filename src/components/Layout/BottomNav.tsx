@@ -1,92 +1,68 @@
 /**
- * BottomNav — 底部导航栏
- * 4 个导航项 + 中央 FAB「记一笔」
+ * BottomNav — 底部固定导航栏
+ * 4 普通项 + 1 中央蓝色 FAB（记账入口）
+ * 使用 position: fixed 固定在视口底部
  */
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Paper, BottomNavigation, BottomNavigationAction, Fab, Box } from '@mui/material';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import ReceiptIcon from '@mui/icons-material/Receipt';
-import RestaurantIcon from '@mui/icons-material/Restaurant';
-import SettingsIcon from '@mui/icons-material/Settings';
-import EditIcon from '@mui/icons-material/Edit';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Box } from '@mui/material';
 
 const NAV_ITEMS = [
-  { label: '仪表盘', icon: <DashboardIcon />, path: '/' },
-  { label: '记账', icon: <ReceiptIcon />, path: '/records' },
-  { label: '菜品', icon: <RestaurantIcon />, path: '/dishes' },
-  { label: '设置', icon: <SettingsIcon />, path: '/settings' },
+  { path: '/', icon: '📊', label: '首页' },
+  { path: '/dishes', icon: '📋', label: '菜单' },
+  { path: '/records', icon: '＋', label: '记账', isFab: true },
+  { path: '/ingredients', icon: '📦', label: '原料' },
+  { path: '/settings', icon: '⚙️', label: '设置' },
 ];
 
 export default function BottomNav() {
-  const location = useLocation();
   const navigate = useNavigate();
-
-  const currentPath = '/' + location.pathname.split('/').filter(Boolean)[0] || '/';
-  const activeIndex = NAV_ITEMS.findIndex((item) => item.path === currentPath);
+  const location = useLocation();
 
   return (
-    <Paper
+    <Box
+      className="bottom-nav-container"
       sx={{
         position: 'fixed',
         bottom: 0,
-        left: 0,
-        right: 0,
-        zIndex: 1000,
-        pb: 'env(safe-area-inset-bottom, 0px)',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: 375,
+        maxWidth: '100%',
+        zIndex: 100,
       }}
-      elevation={3}
     >
-      <Box sx={{ position: 'relative' }}>
-        <BottomNavigation
-          value={activeIndex >= 0 ? activeIndex : 0}
-          onChange={(_e, newIdx) => {
-            if (NAV_ITEMS[newIdx]) {
-              navigate(NAV_ITEMS[newIdx].path);
-            }
-          }}
-          sx={{
-            height: 64,
-            '& .MuiBottomNavigationAction-root': {
-              minWidth: 0,
-              maxWidth: 'none',
-              py: 0.5,
-            },
-            '& .MuiBottomNavigationAction-label': {
-              fontSize: 11,
-            },
-          }}
-        >
-          {NAV_ITEMS.map((item) => (
-            <BottomNavigationAction
-              key={item.path}
-              label={item.label}
-              icon={item.icon}
-              sx={{
-                // 中间两项留出 FAB 空间
-                ...(item.path === '/records' && { mr: 4 }),
-                ...(item.path === '/dishes' && { ml: 4 }),
-              }}
-            />
-          ))}
-        </BottomNavigation>
+      {NAV_ITEMS.map((item) => {
+        const isActive = item.isFab ? false : location.pathname === item.path;
 
-        {/* 中央 FAB */}
-        <Fab
-          color="primary"
-          size="medium"
-          onClick={() => navigate('/records')}
-          sx={{
-            position: 'absolute',
-            top: -20,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            boxShadow: 4,
-            zIndex: 1,
-          }}
-        >
-          <EditIcon />
-        </Fab>
-      </Box>
-    </Paper>
+        if (item.isFab) {
+          return (
+            <button
+              key={item.path}
+              className="nav-center-fab"
+              onClick={() => navigate(item.path)}
+              aria-label="记账"
+            >
+              ＋
+            </button>
+          );
+        }
+
+        return (
+          <button
+            key={item.path}
+            className="nav-item"
+            onClick={() => navigate(item.path)}
+            style={{
+              color: isActive ? 'var(--primary)' : 'var(--text-secondary)',
+              fontWeight: isActive ? 700 : 500,
+              fontSize: 11,
+            }}
+          >
+            <span className="nav-icon" style={{ fontSize: 22 }}>{item.icon}</span>
+            {item.label}
+          </button>
+        );
+      })}
+    </Box>
   );
 }

@@ -1,8 +1,7 @@
 /**
- * PeriodStatusChips — 时段完成状态 Chips
- * 展示各时段记账状态（早市✓ / 午市✓ / 晚市✓ / 其他）
+ * PeriodStatusChips — 时段完成状态标签
+ * 居中展示各时段记账状态（绿色已完成 / 灰色未记账）
  */
-import { Box, Chip } from '@mui/material';
 import { PERIODS, PERIOD_LABELS, PERIOD_ICONS } from '../../constants';
 import { useTodayRecords } from '../../hooks/useTodayRecords';
 import type { Period } from '../../types';
@@ -10,7 +9,6 @@ import type { Period } from '../../types';
 export default function PeriodStatusChips() {
   const { income, expense } = useTodayRecords();
 
-  // 合并该时段的所有记录
   const periodHasRecords = (period: Period): boolean => {
     return (
       income.some((r) => r.period === period) ||
@@ -19,26 +17,31 @@ export default function PeriodStatusChips() {
   };
 
   return (
-    <Box display="flex" gap={1} flexWrap="wrap" mb={2}>
+    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 10 }}>
       {PERIODS.map((period) => {
         const hasData = periodHasRecords(period);
         return (
-          <Chip
+          <span
             key={period}
-            icon={<Box component="span" sx={{ fontSize: 14 }}>{PERIOD_ICONS[period]}</Box>}
-            label={
-              <span>
-                {PERIOD_LABELS[period]}
-                {hasData ? ' ✓' : ''}
-              </span>
-            }
-            variant={hasData ? 'filled' : 'outlined'}
-            color={hasData ? 'primary' : 'default'}
-            size="small"
-            sx={{ fontWeight: 500 }}
-          />
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 4,
+              padding: '4px 10px',
+              borderRadius: 16,
+              fontSize: 12,
+              fontWeight: 500,
+              background: hasData ? 'var(--green-bg)' : 'var(--bg)',
+              color: hasData ? 'var(--green)' : 'var(--text-secondary)',
+              border: `1px solid ${hasData ? 'var(--green)' : 'var(--border)'}`,
+            }}
+          >
+            <span style={{ fontSize: 13 }}>{PERIOD_ICONS[period]}</span>
+            {PERIOD_LABELS[period]}
+            {hasData ? ' ✓' : ''}
+          </span>
         );
       })}
-    </Box>
+    </div>
   );
 }

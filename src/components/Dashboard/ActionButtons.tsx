@@ -1,83 +1,78 @@
 /**
- * ActionButtons — 仪表盘操作按钮区域
- * 「开始记账」大按钮 + 菜品/趋势入口
+ * ActionButtons — 仪表盘操作按钮区
+ * 蓝色药丸大按钮 + 成本档案/经营趋势入口卡片
  */
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, Paper, Typography } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import RestaurantIcon from '@mui/icons-material/Restaurant';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
 export default function ActionButtons() {
   const navigate = useNavigate();
 
   return (
-    <Box mb={2}>
-      {/* 主操作按钮 */}
-      <Button
-        variant="contained"
-        size="large"
-        fullWidth
-        startIcon={<EditIcon />}
+    <div style={{ marginBottom: 10 }}>
+      {/* 主操作 — 蓝色药丸大按钮 */}
+      <button
+        className="btn-pill btn-pill-primary"
         onClick={() => navigate('/records')}
-        sx={{
-          py: 1.5,
-          mb: 1.5,
+        style={{
+          width: '100%',
+          padding: '14px 20px',
           fontSize: 18,
           fontWeight: 700,
-          boxShadow: 2,
+          marginBottom: 10,
+          boxShadow: '0 2px 8px rgba(25,118,210,0.3)',
         }}
       >
-        开始记账
-      </Button>
+        ✏️ 开始记账
+      </button>
 
       {/* 辅助入口卡片 */}
-      <Box display="flex" gap={1.5}>
-        <Paper
+      <div style={{ display: 'flex', gap: 8 }}>
+        {/* 菜品成本档案 */}
+        <div
+          className="card"
           onClick={() => navigate('/dishes')}
-          sx={{
+          style={{
             flex: 1,
-            p: 2,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             cursor: 'pointer',
-            '&:active': { opacity: 0.8 },
+            padding: '10px 12px',
           }}
         >
-          <Box display="flex" alignItems="center" gap={1}>
-            <RestaurantIcon color="primary" />
-            <Box>
-              <Typography variant="body2" fontWeight={600}>菜品成本档案</Typography>
-              <Typography variant="caption" color="text.secondary">管理菜品与原料</Typography>
-            </Box>
-          </Box>
-          <ChevronRightIcon color="action" />
-        </Paper>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 20 }}>🍳</span>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>菜品成本档案</div>
+              <div style={{ fontSize: 10, color: 'var(--text-secondary)' }}>管理菜品与原料</div>
+            </div>
+          </div>
+          <span style={{ color: 'var(--text-secondary)', fontSize: 16 }}>›</span>
+        </div>
 
-        <Paper
+        {/* 经营趋势 */}
+        <div
+          className="card"
           onClick={() => navigate('/trends')}
-          sx={{
+          style={{
             flex: 1,
-            p: 2,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             cursor: 'pointer',
-            '&:active': { opacity: 0.8 },
+            padding: '10px 12px',
           }}
         >
-          <Box display="flex" alignItems="center" gap={1}>
-            <TrendingUpIcon color="secondary" />
-            <Box>
-              <Typography variant="body2" fontWeight={600}>经营趋势</Typography>
-              <Typography variant="caption" color="text.secondary">收支走势分析</Typography>
-            </Box>
-          </Box>
-          <ChevronRightIcon color="action" />
-        </Paper>
-      </Box>
-    </Box>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 20 }}>📈</span>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>经营趋势</div>
+              <div style={{ fontSize: 10, color: 'var(--text-secondary)' }}>收支走势分析</div>
+            </div>
+          </div>
+          <span style={{ color: 'var(--text-secondary)', fontSize: 16 }}>›</span>
+        </div>
+      </div>
+    </div>
   );
 }

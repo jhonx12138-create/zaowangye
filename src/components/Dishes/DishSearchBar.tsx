@@ -1,9 +1,8 @@
 /**
  * DishSearchBar — 菜品搜索栏
- * 搜索框 + 排序方式选择
+ * 搜索框 + 排序按钮组
  */
-import { TextField, InputAdornment, ToggleButtonGroup, ToggleButton, Box, Typography } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
+import { TextField, InputAdornment } from '@mui/material';
 
 interface DishSearchBarProps {
   search: string;
@@ -12,41 +11,51 @@ interface DishSearchBarProps {
   onSortChange: (val: 'name' | 'margin' | 'sales') => void;
 }
 
+const SORT_OPTIONS: { key: 'name' | 'margin' | 'sales'; label: string }[] = [
+  { key: 'name', label: '名称' },
+  { key: 'margin', label: '毛利率' },
+  { key: 'sales', label: '销量' },
+];
+
 export default function DishSearchBar({ search, onSearchChange, sortBy, onSortChange }: DishSearchBarProps) {
   return (
-    <Box mb={2}>
+    <div style={{ marginBottom: 10 }}>
       <TextField
         fullWidth
         size="small"
         placeholder="搜索菜品…"
         value={search}
         onChange={(e) => onSearchChange(e.target.value)}
-        sx={{ mb: 1 }}
+        sx={{
+          mb: 1,
+          '& .MuiOutlinedInput-root': { borderRadius: 'var(--radius-sm)' },
+        }}
         InputProps={{
           startAdornment: (
-            <InputAdornment position="start"><SearchIcon /></InputAdornment>
+            <InputAdornment position="start" sx={{ color: 'var(--text-secondary)' }}>
+              🔍
+            </InputAdornment>
           ),
         }}
       />
-      <Box display="flex" alignItems="center" gap={1}>
-        <Typography variant="caption" color="text.secondary">排序：</Typography>
-        <ToggleButtonGroup
-          value={sortBy}
-          exclusive
-          onChange={(_, val) => val && onSortChange(val)}
-          size="small"
-        >
-          <ToggleButton value="name" sx={{ px: 1.5, py: 0.25, fontSize: 12, textTransform: 'none' }}>
-            名称
-          </ToggleButton>
-          <ToggleButton value="margin" sx={{ px: 1.5, py: 0.25, fontSize: 12, textTransform: 'none' }}>
-            毛利率
-          </ToggleButton>
-          <ToggleButton value="sales" sx={{ px: 1.5, py: 0.25, fontSize: 12, textTransform: 'none' }}>
-            销量
-          </ToggleButton>
-        </ToggleButtonGroup>
-      </Box>
-    </Box>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>排序：</span>
+        <div style={{ display: 'flex', gap: 4 }}>
+          {SORT_OPTIONS.map((opt) => {
+            const isActive = sortBy === opt.key;
+            return (
+              <button
+                key={opt.key}
+                onClick={() => onSortChange(opt.key)}
+                className={`tag-btn${isActive ? ' active' : ''}`}
+                style={{ fontSize: 12, padding: '3px 12px' }}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 }

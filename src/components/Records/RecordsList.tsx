@@ -1,9 +1,7 @@
 /**
  * RecordsList — 今日已记列表
- * 展示收入/支出记录，支持删除
+ * 卡片化展示收入/支出记录，支持删除
  */
-import { Box, Typography, Paper, IconButton, Chip, Divider } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { useTodayRecords } from '../../hooks/useTodayRecords';
 import { useRecordStore } from '../../stores/useRecordStore';
 import { PERIOD_LABELS, EXPENSE_CATEGORY_LABELS, formatMoney } from '../../constants';
@@ -16,100 +14,118 @@ export default function RecordsList() {
 
   if (!hasRecords) {
     return (
-      <Paper sx={{ p: 4, textAlign: 'center' }}>
-        <Typography color="text.secondary">今日暂无记录</Typography>
-        <Typography variant="caption" color="text.disabled">
+      <div className="card" style={{ textAlign: 'center', padding: 32 }}>
+        <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginBottom: 4 }}>今日暂无记录</div>
+        <div style={{ fontSize: 11, color: 'var(--text-secondary)', opacity: 0.7 }}>
           切换到「记一笔」开始记账
-        </Typography>
-      </Paper>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Box display="flex" flexDirection="column" gap={1.5}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       {/* 收入记录 */}
       {income.length > 0 && (
-        <Box>
-          <Typography variant="body2" fontWeight={700} color="success.main" mb={1}>
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--green)', marginBottom: 6 }}>
             📈 收入 · {income.length} 笔
-          </Typography>
+          </div>
           {income.map((rec) => (
-            <Paper key={rec.id} sx={{ p: 1.5, mb: 1 }}>
-              <Box display="flex" justifyContent="space-between" alignItems="flex-start">
-                <Box flex={1}>
-                  <Box display="flex" alignItems="center" gap={1} mb={0.5}>
-                    <Typography variant="body2" fontWeight={600} color="success.main">
+            <div key={rec.id} className="card" style={{ marginBottom: 6, padding: '10px 12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                    <span className="mono" style={{ fontSize: 14, fontWeight: 600, color: 'var(--green)' }}>
                       +{formatMoney(rec.amount)}
-                    </Typography>
-                    <Chip
-                      label={PERIOD_LABELS[rec.period as Period]}
-                      size="small"
-                      variant="outlined"
-                      sx={{ fontSize: 11, height: 22 }}
-                    />
-                  </Box>
-                  <Typography variant="body2">{rec.note}</Typography>
-                  <Typography variant="caption" color="text.secondary">
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 10,
+                        padding: '1px 6px',
+                        borderRadius: 8,
+                        border: '1px solid var(--border)',
+                        color: 'var(--text-secondary)',
+                      }}
+                    >
+                      {PERIOD_LABELS[rec.period as Period]}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 12 }}>{rec.note}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>
                     {rec.time}
                     {rec.tableDishes.length > 0 && ` · ${rec.tableDishes.length} 道菜`}
-                  </Typography>
-                </Box>
-                <IconButton
-                  size="small"
-                  color="error"
+                  </div>
+                </div>
+                <button
                   onClick={() => deleteIncomeRecord(rec.id)}
+                  style={{
+                    width: 24, height: 24, borderRadius: '50%', border: 'none',
+                    background: 'var(--red-bg)', color: 'var(--red)',
+                    cursor: 'pointer', display: 'flex', alignItems: 'center',
+                    justifyContent: 'center', fontSize: 12, flexShrink: 0,
+                  }}
                 >
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-              </Box>
-            </Paper>
+                  ✕
+                </button>
+              </div>
+            </div>
           ))}
-        </Box>
+        </div>
       )}
 
       {/* 支出记录 */}
       {expense.length > 0 && (
-        <Box>
-          <Typography variant="body2" fontWeight={700} color="error.main" mb={1}>
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--red)', marginBottom: 6 }}>
             📉 支出 · {expense.length} 笔
-          </Typography>
+          </div>
           {expense.map((rec) => (
-            <Paper key={rec.id} sx={{ p: 1.5, mb: 1 }}>
-              <Box display="flex" justifyContent="space-between" alignItems="flex-start">
-                <Box flex={1}>
-                  <Box display="flex" alignItems="center" gap={1} mb={0.5}>
-                    <Typography variant="body2" fontWeight={600} color="error.main">
+            <div key={rec.id} className="card" style={{ marginBottom: 6, padding: '10px 12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4, flexWrap: 'wrap' }}>
+                    <span className="mono" style={{ fontSize: 14, fontWeight: 600, color: 'var(--red)' }}>
                       -{formatMoney(rec.amount)}
-                    </Typography>
-                    <Chip
-                      label={PERIOD_LABELS[rec.period as Period]}
-                      size="small"
-                      variant="outlined"
-                      sx={{ fontSize: 11, height: 22 }}
-                    />
-                    <Chip
-                      label={EXPENSE_CATEGORY_LABELS[rec.category as ExpenseCategory]}
-                      size="small"
-                      sx={{ fontSize: 11, height: 22, bgcolor: 'grey.100' }}
-                    />
-                  </Box>
-                  <Typography variant="body2">{rec.note}</Typography>
-                  <Typography variant="caption" color="text.secondary">
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 10, padding: '1px 6px', borderRadius: 8,
+                        border: '1px solid var(--border)', color: 'var(--text-secondary)',
+                      }}
+                    >
+                      {PERIOD_LABELS[rec.period as Period]}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 10, padding: '1px 6px', borderRadius: 8,
+                        background: 'var(--bg)', color: 'var(--text-secondary)',
+                      }}
+                    >
+                      {EXPENSE_CATEGORY_LABELS[rec.category as ExpenseCategory]}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 12 }}>{rec.note}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>
                     {rec.time}
-                  </Typography>
-                </Box>
-                <IconButton
-                  size="small"
-                  color="error"
+                  </div>
+                </div>
+                <button
                   onClick={() => deleteExpenseRecord(rec.id)}
+                  style={{
+                    width: 24, height: 24, borderRadius: '50%', border: 'none',
+                    background: 'var(--red-bg)', color: 'var(--red)',
+                    cursor: 'pointer', display: 'flex', alignItems: 'center',
+                    justifyContent: 'center', fontSize: 12, flexShrink: 0,
+                  }}
                 >
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-              </Box>
-            </Paper>
+                  ✕
+                </button>
+              </div>
+            </div>
           ))}
-        </Box>
+        </div>
       )}
-    </Box>
+    </div>
   );
 }

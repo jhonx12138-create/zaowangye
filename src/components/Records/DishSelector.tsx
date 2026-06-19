@@ -1,15 +1,9 @@
 /**
  * DishSelector — 菜品选择器
- * 搜索框 + 分类 Tabs + 菜品列表（含价格/成本/毛利/数量调节）
+ * 搜索框 + 分类 Chip 按钮（带 emoji 图标） + 菜品卡列表
  */
 import { useState, useMemo } from 'react';
-import {
-  Box, TextField, InputAdornment, Tabs, Tab, Typography, IconButton,
-  Paper, Chip
-} from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
+import { TextField, InputAdornment } from '@mui/material';
 import { useMenuStore } from '../../stores/useMenuStore';
 import { getDishCost, getGrossMargin } from '../../utils/calculations';
 import { DISH_CATEGORIES, formatMoney, formatPercent, MARGIN_COLORS, MARGIN_THRESHOLDS } from '../../constants';
@@ -20,6 +14,16 @@ interface DishSelectorProps {
   onAdd: (menuId: string) => void;
   onRemove: (menuId: string) => void;
 }
+
+/** 分类名 → emoji 映射 */
+const CATEGORY_EMOJI: Record<string, string> = {
+  '全部': '📋',
+  '凉菜': '🥗',
+  '热菜': '🍖',
+  '主食': '🍜',
+  '汤品': '🍲',
+  '饮品': '🥤',
+};
 
 export default function DishSelector({ selected, onAdd, onRemove }: DishSelectorProps) {
   const [search, setSearch] = useState('');
@@ -43,17 +47,17 @@ export default function DishSelector({ selected, onAdd, onRemove }: DishSelector
   // 空状态
   if (menuItems.length === 0) {
     return (
-      <Paper sx={{ p: 4, textAlign: 'center', mb: 2 }}>
-        <Typography color="text.secondary">暂无菜品数据</Typography>
-        <Typography variant="caption" color="text.disabled">
+      <div className="card" style={{ textAlign: 'center', padding: 24, marginBottom: 10 }}>
+        <div style={{ color: 'var(--text-secondary)', marginBottom: 4 }}>暂无菜品数据</div>
+        <div style={{ fontSize: 12, color: 'var(--text-secondary)', opacity: 0.7 }}>
           请先在「菜品成本档案」中添加菜品
-        </Typography>
-      </Paper>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Box>
+    <div>
       {/* 搜索框 */}
       <TextField
         fullWidth
@@ -61,44 +65,62 @@ export default function DishSelector({ selected, onAdd, onRemove }: DishSelector
         placeholder="搜索菜品…"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        sx={{ mb: 1.5 }}
+        sx={{
+          mb: 1,
+          '& .MuiOutlinedInput-root': { borderRadius: 'var(--radius-sm)' },
+        }}
         InputProps={{
           startAdornment: (
-            <InputAdornment position="start"><SearchIcon /></InputAdornment>
+            <InputAdornment position="start" sx={{ color: 'var(--text-secondary)' }}>
+              🔍
+            </InputAdornment>
           ),
         }}
       />
 
-      {/* 分类 Tabs */}
-      <Tabs
-        value={categories.indexOf(category)}
-        onChange={(_, idx) => setCategory(categories[idx])}
-        variant="scrollable"
-        scrollButtons="auto"
-        sx={{
-          mb: 1.5,
-          minHeight: 40,
-          '& .MuiTab-root': { minHeight: 40, py: 0.5, fontSize: 13, fontWeight: 600 },
-        }}
-      >
-        {categories.map((cat) => (
-          <Tab key={cat} label={cat} />
-        ))}
-      </Tabs>
+      {/* 分类 Chip 按钮 */}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 10, overflowX: 'auto', paddingBottom: 2 }}>
+        {categories.map((cat) => {
+          const isActive = category === cat;
+          const emoji = CATEGORY_EMOJI[cat] || '';
+          return (
+            <button
+              key={cat}
+              onClick={() => setCategory(cat)}
+              style={{
+                flexShrink: 0,
+                padding: '8px 14px',
+                borderRadius: 24,
+                fontSize: 12,
+                fontWeight: 600,
+                cursor: 'pointer',
+                border: `1.5px solid var(--primary)`,
+                background: isActive ? 'var(--primary)' : '#fff',
+                color: isActive ? '#fff' : 'var(--primary)',
+                whiteSpace: 'nowrap',
+                fontFamily: 'inherit',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              {emoji} {cat}
+            </button>
+          );
+        })}
+      </div>
 
       {/* 菜品列表 */}
       {filteredDishes.length === 0 ? (
-        <Paper sx={{ p: 3, textAlign: 'center', mb: 2 }}>
-          <Typography color="text.secondary">
+        <div className="card" style={{ textAlign: 'center', padding: 20, marginBottom: 10 }}>
+          <div style={{ color: 'var(--text-secondary)', fontSize: 13 }}>
             {search ? `没有找到"${search}"相关的菜品` : '该分类下暂无菜品'}
-          </Typography>
-        </Paper>
+          </div>
+        </div>
       ) : (
-        <Box display="flex" flexDirection="column" gap={1} mb={2}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 10 }}>
           {filteredDishes.map((dish) => {
             const cost = getDishCost(dish.id);
             const margin = getGrossMargin(dish.price, cost);
-            const marginColor =
+            const marginColor: string =
               margin >= MARGIN_THRESHOLDS.high ? MARGIN_COLORS.high :
               margin >= MARGIN_THRESHOLDS.mid ? MARGIN_COLORS.mid :
               MARGIN_COLORS.low;
@@ -106,74 +128,96 @@ export default function DishSelector({ selected, onAdd, onRemove }: DishSelector
             const qty = sel?.qty ?? 0;
 
             return (
-              <Paper
+              <div
                 key={dish.id}
-                sx={{
-                  p: 1.5,
+                className="card"
+                style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 1.5,
-                  border: qty > 0 ? 2 : 0,
-                  borderColor: qty > 0 ? 'primary.main' : 'transparent',
+                  gap: 10,
+                  padding: '10px 12px',
+                  border: qty > 0 ? '2px solid var(--primary)' : undefined,
                 }}
               >
                 {/* 菜品信息 */}
-                <Box flex={1} minWidth={0}>
-                  <Box display="flex" alignItems="center" gap={1} mb={0.5}>
-                    <Typography variant="body2" fontWeight={600} noWrap>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                    <span style={{ fontSize: 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {dish.name}
-                    </Typography>
-                    <Chip
-                      label={formatMoney(dish.price)}
-                      size="small"
-                      color="primary"
-                      variant="outlined"
-                      sx={{ fontSize: 11, height: 22 }}
-                    />
-                  </Box>
-                  <Box display="flex" alignItems="center" gap={1}>
-                    <Typography variant="caption" color="text.secondary">
-                      成本{formatMoney(cost)}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{ color: marginColor, fontWeight: 600 }}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 11,
+                        padding: '1px 6px',
+                        borderRadius: 10,
+                        border: '1.5px solid var(--primary)',
+                        color: 'var(--primary)',
+                        fontWeight: 500,
+                      }}
                     >
+                      {formatMoney(dish.price)}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
+                      成本{formatMoney(cost)}
+                    </span>
+                    <span style={{ fontSize: 11, color: marginColor, fontWeight: 600 }}>
                       毛利{formatPercent(margin)}
-                    </Typography>
-                  </Box>
-                </Box>
+                    </span>
+                  </div>
+                </div>
 
                 {/* 数量调节 */}
-                <Box display="flex" alignItems="center" gap={0.5}>
-                  <IconButton
-                    size="small"
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                  <button
                     disabled={qty === 0}
                     onClick={() => onRemove(dish.id)}
-                    sx={{ bgcolor: qty > 0 ? 'primary.light' : 'action.hover', width: 32, height: 32 }}
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: '50%',
+                      border: 'none',
+                      background: qty > 0 ? 'var(--primary-bg)' : 'var(--bg)',
+                      color: qty > 0 ? 'var(--primary)' : 'var(--text-secondary)',
+                      cursor: qty > 0 ? 'pointer' : 'default',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 16,
+                      fontWeight: 600,
+                    }}
                   >
-                    <RemoveIcon fontSize="small" />
-                  </IconButton>
-                  <Typography
-                    variant="body2"
-                    fontWeight={700}
-                    sx={{ minWidth: 24, textAlign: 'center' }}
-                  >
+                    −
+                  </button>
+                  <span className="mono" style={{ fontSize: 15, fontWeight: 700, minWidth: 20, textAlign: 'center' }}>
                     {qty}
-                  </Typography>
-                  <IconButton
-                    size="small"
+                  </span>
+                  <button
                     onClick={() => onAdd(dish.id)}
-                    sx={{ bgcolor: 'primary.main', color: 'white', width: 32, height: 32, '&:hover': { bgcolor: 'primary.dark' } }}
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: '50%',
+                      border: 'none',
+                      background: 'var(--primary)',
+                      color: '#fff',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 16,
+                      fontWeight: 600,
+                    }}
                   >
-                    <AddIcon fontSize="small" />
-                  </IconButton>
-                </Box>
-              </Paper>
+                    +
+                  </button>
+                </div>
+              </div>
             );
           })}
-        </Box>
+        </div>
       )}
-    </Box>
+    </div>
   );
 }
